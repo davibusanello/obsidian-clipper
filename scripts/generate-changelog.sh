@@ -27,30 +27,42 @@ echo "Generating changelog for $VERSION (commits since $LAST_TAG)"
 # Collect commits
 NEW=""
 IMPROVED=""
+FIXES=""
 
 while IFS= read -r subject; do
 	if echo "$subject" | grep -qiE '^bump version|^version bump'; then
 		continue
 	elif echo "$subject" | grep -qiE '^fix'; then
 		subject=$(echo "$subject" | sed -E 's/^fix: /Fix /i;s/^fix/Fix/')
-		IMPROVED+="- $subject"$'\n'
-	else
+		FIXES+="- $subject"$'\n'
+	elif echo "$subject" | grep -qiE '^add|^new'; then
 		NEW+="- $subject"$'\n'
+	else
+		IMPROVED+="- $subject"$'\n'
 	fi
 done < <(git log "$LAST_TAG"..HEAD --format="%s" --no-merges)
 
 # Generate changelog
 {
+	NEEDS_SPACER=false
 	if [ -n "$NEW" ]; then
+		echo "## New"
+		echo ""
 		printf "%s" "$NEW"
+		NEEDS_SPACER=true
 	fi
 	if [ -n "$IMPROVED" ]; then
-		if [ -n "$NEW" ]; then
-			echo ""
-		fi
+		if $NEEDS_SPACER; then echo ""; fi
 		echo "## Improved"
 		echo ""
 		printf "%s" "$IMPROVED"
+		NEEDS_SPACER=true
+	fi
+	if [ -n "$FIXES" ]; then
+		if $NEEDS_SPACER; then echo ""; fi
+		echo "## Fixes"
+		echo ""
+		printf "%s" "$FIXES"
 	fi
 } > "$OUTPUT"
 
