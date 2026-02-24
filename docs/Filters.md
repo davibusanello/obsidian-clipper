@@ -45,6 +45,13 @@ Converts text to `camelCase`.
 
 Capitalizes the first character of the value and converts the rest to lowercase, e.g. `"hELLO wORLD"|capitalize` returns `"Hello world"`.
 
+### `decode_uri`
+
+Decodes a URI-encoded string, e.g. `"%E4%BD%A0%E5%A5%BD"|decode_uri` returns `"你好"`.
+
+- `"hello%20world"|decode_uri` returns `"hello world"`.
+- Returns the original string if decoding fails (e.g. malformed URI sequences).
+
 ### `kebab`
 
 Converts text to `kebab-case`.
