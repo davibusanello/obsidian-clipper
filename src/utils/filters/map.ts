@@ -38,16 +38,23 @@ export const map = (str: string, param?: string): string => {
 
 		const mappedArray = array.map((item, index) => {
 			debugLog('Map', `Processing item ${index}:`, JSON.stringify(item, null, 2));
+
+			// Strip outer parentheses for object literal syntax: ({key: value})
+			let expr = expression.trim();
+			if (expr.startsWith('(') && expr.endsWith(')')) {
+				expr = expr.slice(1, -1).trim();
+			}
+
 			// Check if the expression is an object literal or a string literal
-			if ((expression.trim().startsWith('{') && expression.trim().endsWith('}')) ||
-				(expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
-				(expression.trim().startsWith("'") && expression.trim().endsWith("'"))) {
+			if ((expr.startsWith('{') && expr.endsWith('}')) ||
+				(expr.startsWith('"') && expr.endsWith('"')) ||
+				(expr.startsWith("'") && expr.endsWith("'"))) {
 				// Use a simple object to store the mapped properties
 				const mappedItem: { [key: string]: any } = {};
 
 				// Parse the expression to extract property assignments or string literal
-				if (expression.trim().startsWith('{')) {
-					const assignments = expression.match(/\{(.+)\}/)?.[1].split(',') || [];
+				if (expr.startsWith('{')) {
+					const assignments = expr.match(/\{(.+)\}/)?.[1].split(',') || [];
 
 					assignments.forEach((assignment) => {
 						const [key, value] = assignment.split(':').map(s => s.trim());
@@ -62,7 +69,7 @@ export const map = (str: string, param?: string): string => {
 					});
 				} else {
 					// Handle string literal
-					const stringLiteral = expression.trim().slice(1, -1);
+					const stringLiteral = expr.slice(1, -1);
 					mappedItem.str = stringLiteral.replace(new RegExp(`\\$\\{${argName}\\}`, 'g'), item);
 				}
 

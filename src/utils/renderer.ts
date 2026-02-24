@@ -640,6 +640,10 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 				if (isQuotedString(a)) {
 					return a;
 				}
+				// Don't quote arrow function expressions (e.g., map:item => item.name)
+				if (/\s*\w+\s*=>/.test(a)) {
+					return a;
+				}
 				// Don't quote simple values that don't need quoting
 				// e.g., "3:4", "2n", "abc" should stay unquoted
 				if (/^[\w.:+\-*/]+$/.test(a)) {

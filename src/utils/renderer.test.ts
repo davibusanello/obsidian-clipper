@@ -472,6 +472,45 @@ Tags:
 		});
 	});
 
+	describe('Map Filter', () => {
+		test('map extracts property from array of objects', async () => {
+			const ctx = createContext({
+				items: [{ gem: 'obsidian', color: 'black' }, { gem: 'amethyst', color: 'purple' }],
+			});
+			// Use the real filter infrastructure via renderTemplate
+			const output = await renderTemplate(
+				'{{items|map:item => item.gem}}',
+				{ items: JSON.stringify(ctx.variables.items) },
+			);
+			expect(output).toBe('["obsidian","amethyst"]');
+		});
+
+		test('map with object literal expression', async () => {
+			const items = [{ gem: 'obsidian', color: 'black' }, { gem: 'amethyst', color: 'purple' }];
+			const output = await renderTemplate(
+				'{{items|map:item => ({name: item.gem, color: item.color})}}',
+				{ items: JSON.stringify(items) },
+			);
+			const parsed = JSON.parse(output);
+			expect(parsed).toEqual([
+				{ name: 'obsidian', color: 'black' },
+				{ name: 'amethyst', color: 'purple' },
+			]);
+		});
+
+		test('map with string literal expression', async () => {
+			const output = await renderTemplate(
+				'{{items|map:item => "genres/${item}"}}',
+				{ items: JSON.stringify(['rock', 'pop']) },
+			);
+			const parsed = JSON.parse(output);
+			expect(parsed).toEqual([
+				{ str: 'genres/rock' },
+				{ str: 'genres/pop' },
+			]);
+		});
+	});
+
 	describe('Convenience Function', () => {
 		test('renderTemplate convenience function works', async () => {
 			const output = await renderTemplate('Hello {{name}}!', { name: 'World' });

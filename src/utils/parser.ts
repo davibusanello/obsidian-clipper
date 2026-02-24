@@ -757,7 +757,13 @@ function parseFilterArgument(state: ParserState): Expression | null {
 					if (braceDepth < 0 || parenDepth < 0) break;
 				}
 
+				// Preserve quotes around string tokens so the map filter
+			// can distinguish string literals from property expressions
+			if (token.type === 'string') {
+				value += `"${token.value}"`;
+			} else {
 				value += token.value;
+			}
 				advance(state);
 			}
 
