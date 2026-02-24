@@ -34,3 +34,14 @@ npm run add-locale fr
 - Updates `version` in `package.json`, all browser manifests, and `dev/manifest.json`
 - Updates `MARKETING_VERSION` in the Xcode project
 - Increments `CURRENT_PROJECT_VERSION` by 1
+
+### Changelog
+
+```bash
+./scripts/generate-changelog.sh
+```
+
+- Generates `changelogs/<version>.md` from commits since the last git tag
+- Reads the version from `package.json`
+- Commits starting with "fix" are grouped under an **Improved** section
+- Version bump commits are excluded
